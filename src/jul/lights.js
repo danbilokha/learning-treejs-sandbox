@@ -1,5 +1,5 @@
 import * as THREE from "three";
 
-export function getPointLight(intensity) {
-  return new THREE.PointLight("yellow", intensity);
+export function getPointLight(intensity, color) {
+  return new THREE.PointLight(color, intensity);
 }

@@ -5,8 +5,6 @@ import { update } from "./update";
 import { getSphere, getBox, getPlane } from "./objects";
 import {getPointLight} from './lights';
 
-console.log('jul');
-
 function init(fogEnabled) {
   const scene = new THREE.Scene();
   const gui = new datGui.GUI();
@@ -22,18 +20,11 @@ function init(fogEnabled) {
   plane.rotation.x = Math.PI / 2;
 
   const sphere = getSphere(0.05);
-  const light = getPointLight(0.5);
+  const light = getPointLight('white', 0.5);
   light.position.y = 1.5;
-  light.position.x = 1;
+  light.position.x = 0.2;
   light.position.z = 1;
   light.add(sphere);
-
-  const sphere1 = getSphere(0.05);
-  const light1 = getPointLight(0.5);
-  light1.position.y = 1.5;
-  light1.position.x = -1;
-  light1.position.z = 1;
-  light1.add(sphere1);
 
   gui.add(light, "intensity", 0, 10);
   gui.add(light.position, "y", 0, 10);
@@ -42,7 +33,6 @@ function init(fogEnabled) {
   scene.add(box);
   scene.add(plane);
   scene.add(light);
-  scene.add(light1);
 
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -68,5 +58,5 @@ function init(fogEnabled) {
   return scene;
 }
 
-let fogEnabled = false;
+const fogEnabled = false;
 const scene = init(fogEnabled);
