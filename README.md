@@ -9,4 +9,5 @@
 
 <h2>File Structure</h2>
 
-*
+* assets, learningCodeRef, lib - supporting files from Linkendin Learning course,
+* dan, jul - learners folders.
