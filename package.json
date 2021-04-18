@@ -17,7 +17,8 @@
     "jshint": "^2.12.0",
     "lodash": "^4.17.21",
     "noisejs": "^2.1.0",
-    "three": "^0.127.0"
+    "three": "^0.127.0",
+    "twinjs": "^1.0.17"
   },
   "devDependencies": {
     "@babel/core": "^7.13.15",
