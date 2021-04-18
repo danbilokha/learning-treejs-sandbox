@@ -21,12 +21,12 @@ export function getBoxGrid(amount, separationMultiplier) {
 	var group = new THREE.Group();
 
 	for (var i=0; i<amount; i++) {
-		var obj = getBox(1, 1, 1);
+		var obj = getBox(1, 3, 1);
 		obj.position.x = i * separationMultiplier;
 		obj.position.y = obj.geometry.parameters.height/2;
 		group.add(obj);
 		for (var j=1; j<amount; j++) {
-			var obj = getBox(1, 1, 1);
+			var obj = getBox(1, 3, 1);
 			obj.position.x = i * separationMultiplier;
 			obj.position.y = obj.geometry.parameters.height/2;
 			obj.position.z = j * separationMultiplier;
@@ -40,10 +40,10 @@ export function getBoxGrid(amount, separationMultiplier) {
 	return group;
 }
 
-export function getPlane(size) {
+export function getPlane(size, color = 'gray') {
   const geometry = new THREE.PlaneGeometry(size, size);
   const material = new THREE.MeshPhongMaterial({
-    color: "gray",
+    color,
     side: THREE.DoubleSide,
   });
 
