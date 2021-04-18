@@ -7,7 +7,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "start": "npx webpack serve",
+    "start:jul": "ESTUDIANTE=jul npx webpack serve",
+    "start:dan": "ESTUDIANTE=dan npx webpack serve",
     "prod": "webpack --mode=production"
   },
   "author": "Danylo Bilokha",

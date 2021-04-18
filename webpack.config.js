@@ -1,11 +1,12 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const {resolve, join} = require("path");
 
-const firstLesson = "./src/chapter-01/01_02/begin";
+let student = process.env.ESTUDIANTE ?? 'jul';
+const folder = `${__dirname}/src/${student}`;
 
 module.exports = {
   context: __dirname,
-  entry: `${firstLesson}/main.js`,
+  entry: `${folder}/main.js`,
   output: {
     path: resolve(__dirname, "dist"),
     filename: "main.js",
@@ -16,7 +17,7 @@ module.exports = {
   plugins: [
     new HtmlWebPackPlugin({
       title: "Treejs",
-      template: `${firstLesson}/index.html`,
+      template: `${folder}/index.html`,
     }),
   ],
 
