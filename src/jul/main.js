@@ -5,8 +5,6 @@ import { update } from "./update";
 import { getSphere, getBox, getPlane } from "./objects";
 import {getPointLight} from './lights';
 
-console.log('jul');
-
 function init(fogEnabled) {
   const scene = new THREE.Scene();
   const gui = new datGui.GUI();
