@@ -1,7 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const {resolve, join} = require("path");
 
-let student = process.env.ESTUDIANTE ?? 'jul';
+let student = process.env.ESTUDIANTE;
 const folder = `${__dirname}/src/${student}`;
 
 module.exports = {
