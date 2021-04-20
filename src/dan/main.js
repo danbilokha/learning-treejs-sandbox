@@ -5,7 +5,7 @@ import {
   boxGridMove,
   cameraZPositionMove,
   cameraZRotationMove,
-  cameraXRotationMove,
+  cameraXRotationMoveV2,
 } from "./animate";
 import { getBoxGrid, getPlane } from "./creators/objects";
 import { setupCamera } from "./setupCameras";
@@ -63,8 +63,9 @@ function init(fogEnabled) {
   const mainDiv = document.getElementById("webgl");
   mainDiv.appendChild(renderer.domElement);
 
+  cameraXRotationMoveV2({scene});
+
   update({
-    twin,
     renderer,
     scene,
     camera,
@@ -74,7 +75,6 @@ function init(fogEnabled) {
   });
 
   updatePhase({
-    twin,
     renderer,
     scene,
     camera,

@@ -1,3 +1,5 @@
+import TWEEN from '@tweenjs/tween.js';
+
 /** Recursively calls itself */
 export function update(args) {
   const { renderer, scene, camera, controls, fns } = args;
@@ -6,8 +8,8 @@ export function update(args) {
   }
 
   renderer.render(scene, camera);
-  /** Update camera moving around */
   controls.update();
+  TWEEN.update();
 
   fns?.forEach((fn) => fn(args));
 
@@ -23,6 +25,7 @@ export const updatePhase = (args) => {
   return setInterval(() => {
     requestAnimationFrame(() => {
       renderer.render(scene, camera);
+      controls.update();
       controls.update();
 
       fns?.forEach((fn) => fn(args));
