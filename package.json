@@ -13,12 +13,12 @@
   "author": "Julie Melnychenko & Danylo Bilokha",
   "license": "ISC",
   "dependencies": {
+    "@tweenjs/tween.js": "^18.6.4",
     "dat.gui": "^0.7.7",
     "jshint": "^2.12.0",
     "lodash": "^4.17.21",
     "noisejs": "^2.1.0",
-    "three": "^0.127.0",
-    "twinjs": "^1.0.17"
+    "three": "^0.127.0"
   },
   "devDependencies": {
     "@babel/core": "^7.13.15",

@@ -1,7 +1,12 @@
 import * as datGui from "dat.gui";
 import * as THREE from "three";
 import * as OrbitControls from "./helpers/OrbitControls";
-import { boxGridMove, cameraZPositionMove, cameraZRotationMove, cameraXRotationMove } from "./animate";
+import {
+  boxGridMove,
+  cameraZPositionMove,
+  cameraZRotationMove,
+  cameraXRotationMove,
+} from "./animate";
 import { getBoxGrid, getPlane } from "./creators/objects";
 import { setupCamera } from "./setupCameras";
 import { setupAmbientLight, setupDirectionalLight } from "./setupLights";
@@ -59,15 +64,17 @@ function init(fogEnabled) {
   mainDiv.appendChild(renderer.domElement);
 
   update({
+    twin,
     renderer,
     scene,
     camera,
     controls,
     clock,
-    fns: [boxGridMove, cameraZPositionMove, cameraXRotationMove],
+    fns: [boxGridMove, cameraZPositionMove],
   });
 
   updatePhase({
+    twin,
     renderer,
     scene,
     camera,
