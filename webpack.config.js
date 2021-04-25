@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const {resolve, join} = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 
 let student = process.env.ESTUDIANTE;
 const folder = `${__dirname}/src/${student}`;
@@ -18,6 +19,11 @@ module.exports = {
     new HtmlWebPackPlugin({
       title: "Treejs",
       template: `${folder}/index.html`,
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: "src/assets", to: "dist" },
+      ],
     }),
   ],
 

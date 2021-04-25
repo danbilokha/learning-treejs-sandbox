@@ -27,7 +27,7 @@ function init() {
 	// manipulate materials
 	// load the cube map
 	var path = '/assets/cubemap/';
-	var format = '.jpg';
+	var format = '.jpeg';
 	var urls = [
 		path + 'px' + format, path + 'nx' + format,
 		path + 'py' + format, path + 'ny' + format,
