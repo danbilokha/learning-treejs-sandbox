@@ -1,91 +1,160 @@
-import * as datGui from "dat.gui";
+// import {firstOverallSteps} from './firstOverallSteps';
+// firstOverallSteps();
+
+import * as dat from "dat.gui";
 import * as THREE from "three";
 import * as OrbitControls from "./helpers/OrbitControls";
-import {
-  boxGridMove,
-  cameraZPositionMove,
-  cameraZRotationMove,
-  cameraXRotationMoveV2,
-} from "./animate";
-import { getBoxGrid, getPlane } from "./creators/objects";
-import { setupCamera } from "./setupCameras";
-import { setupAmbientLight, setupDirectionalLight } from "./setupLights";
-import { update, updatePhase } from "./update/update";
+import concrete from './assets/textures/concrete.jpg';
 
-function init(fogEnabled) {
-  const scene = new THREE.Scene();
-  if (fogEnabled) {
-    scene.fog = new THREE.FogExp2("white", 0.2);
-  }
-  const gui = new datGui.GUI();
-  const clock = new THREE.Clock();
+console.log('Needed so it works', OrbitControls);
 
-  const plane = getPlane(1000);
-  plane.rotation.x = Math.PI / 2;
+function init() {
+	var scene = new THREE.Scene();
+	var gui = new dat.GUI();
 
-  const { x: lightPositionX, y: lightPositionY, z: lightPositionZ } = {
-    x: 15,
-    y: 10,
-    z: 10,
-  };
-  const light = setupDirectionalLight({
-    lightPositionX,
-    lightPositionY,
-    lightPositionZ,
-    gui,
-  });
-  const helper = new THREE.CameraHelper(light.shadow.camera);
+	// initialize objects
+	var sphereMaterial = getMaterial('standard', 'white');
+	var sphere = getSphere(sphereMaterial, 1, 24);
 
-  const ambientLight = setupAmbientLight({
-    lightPositionX: 0,
-    lightPositionY: 5,
-    lightPositionZ: 0,
-  });
+	var planeMaterial = getMaterial('standard', 'white');
+	var plane = getPlane(planeMaterial, 30);
 
-  const boxGrid = getBoxGrid(20, 2.5);
-  boxGrid.name = "boxGrid";
+	var lightLeft = getSpotLight(1, 'rgb(255, 220, 180)');
+	var lightRight = getSpotLight(1, 'rgb(255, 220, 180)');
 
-  scene.add(light);
-  scene.add(helper);
-  scene.add(ambientLight);
-  scene.add(plane);
-  scene.add(boxGrid);
+	// manipulate objects
+	sphere.position.y = sphere.geometry.parameters.radius;
+	plane.rotation.x = Math.PI/2;
 
-  const { camera } = setupCamera(gui, scene);
+	lightLeft.position.x = -5;
+	lightLeft.position.y = 2;
+	lightLeft.position.z = -4;
 
-  const renderer = new THREE.WebGLRenderer();
-  renderer.shadowMap.enabled = true;
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor("gray");
+	lightRight.position.x = 5;
+	lightRight.position.y = 2;
+	lightRight.position.z = -4;
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+	// manipulate materials
+  const loader = new THREE.TextureLoader();
+  console.log("loader.load('./assets/textures/concrete.jpg')", loader.load(concrete));
+  
+  planeMaterial.map = loader.load(concrete);
 
-  const mainDiv = document.getElementById("webgl");
-  mainDiv.appendChild(renderer.domElement);
+	// dat.gui
+	var folder1 = gui.addFolder('light_1');
+	folder1.add(lightLeft, 'intensity', 0, 10);
+	folder1.add(lightLeft.position, 'x', -5, 15);
+	folder1.add(lightLeft.position, 'y', -5, 15);
+	folder1.add(lightLeft.position, 'z', -5, 15);
 
-  cameraXRotationMoveV2({scene});
+	var folder2 = gui.addFolder('light_2');
+	folder2.add(lightRight, 'intensity', 0, 10);
+	folder2.add(lightRight.position, 'x', -5, 15);
+	folder2.add(lightRight.position, 'y', -5, 15);
+	folder2.add(lightRight.position, 'z', -5, 15);
 
-  update({
-    renderer,
-    scene,
-    camera,
-    controls,
-    clock,
-    fns: [boxGridMove, cameraZPositionMove],
-  });
+  var folder3 = gui.addFolder('materials');
+  folder3.add(sphereMaterial, 'roughness', 0, 1);
+  folder3.add(planeMaterial, 'roughness', 0, 1);
+  folder3.add(sphereMaterial, 'metalness', 0, 1);
+  folder3.add(planeMaterial, 'metalness', 0, 1);
+  folder3.open();
 
-  updatePhase({
-    renderer,
-    scene,
-    camera,
-    controls,
-    clock,
-    speed: 120,
-    fns: [cameraZRotationMove],
-  });
+	// add objects to the scene
+	scene.add(sphere);
+	scene.add(plane);
+	scene.add(lightLeft);
+	scene.add(lightRight);
 
-  return scene;
+	// camera
+	var camera = new THREE.PerspectiveCamera(
+		45, // field of view
+		window.innerWidth / window.innerHeight, // aspect ratio
+		1, // near clipping plane
+		1000 // far clipping plane
+	);
+	camera.position.z = 7;
+	camera.position.x = -2;
+	camera.position.y = 7;
+	camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+	// renderer
+	var renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
+	document.getElementById('webgl').appendChild(renderer.domElement);
+	
+	var controls = new THREE.OrbitControls( camera, renderer.domElement );
+	
+	update(renderer, scene, camera, controls);
+
+	return scene;
 }
 
-let fogEnabled = false;
-const scene = init(fogEnabled);
+function getSphere(material, size, segments) {
+	var geometry = new THREE.SphereGeometry(size, segments, segments);
+	var obj = new THREE.Mesh(geometry, material);
+	obj.castShadow = true;
+
+	return obj;
+}
+
+function getMaterial(type, color) {
+	var selectedMaterial;
+	var materialOptions = {
+		color: color === undefined ? 'rgb(255, 255, 255)' : color,
+	};
+
+	switch (type) {
+		case 'basic':
+			selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
+			break;
+		case 'lambert':
+			selectedMaterial = new THREE.MeshLambertMaterial(materialOptions);
+			break;
+		case 'phong':
+			selectedMaterial = new THREE.MeshPhongMaterial(materialOptions);
+			break;
+		case 'standard':
+			selectedMaterial = new THREE.MeshStandardMaterial(materialOptions);
+			break;
+		default: 
+			selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
+			break;
+	}
+
+	return selectedMaterial;
+}
+
+function getSpotLight(intensity, color) {
+	color = color === undefined ? 'rgb(255, 255, 255)' : color;
+	var light = new THREE.SpotLight(color, intensity);
+	light.castShadow = true;
+	light.penumbra = 0.5;
+
+	//Set up shadow properties for the light
+	light.shadow.mapSize.width = 2048;  // default: 512
+	light.shadow.mapSize.height = 2048; // default: 512
+	light.shadow.bias = 0.001;
+
+	return light;
+}
+
+function getPlane(material, size) {
+	var geometry = new THREE.PlaneGeometry(size, size);
+	material.side = THREE.DoubleSide;
+	var obj = new THREE.Mesh(geometry, material);
+	obj.receiveShadow = true;
+
+	return obj;
+}
+
+function update(renderer, scene, camera, controls) {
+	controls.update();
+	renderer.render(scene, camera);
+	requestAnimationFrame(function() {
+		update(renderer, scene, camera, controls);
+	});
+}
+
+var scene = init();
