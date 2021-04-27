@@ -1,36 +1,22 @@
-// import {firstOverallSteps} from './firstOverallSteps';
-// firstOverallSteps();
-
 import * as dat from "dat.gui";
-import * as THREE from "three";
+import * as THREE from "./three";
 import * as OrbitControls from "./helpers/OrbitControls";
-import concrete from "./assets/textures/concrete.jpg";
-// import checkerboard from './assets/textures/checkerboard.jpg';
-import fingerprints from "./assets/textures/fingerprints.jpg";
-import nx from "./assets/cubemap/nx.jpeg";
-import ny from "./assets/cubemap/ny.jpeg";
-import nz from "./assets/cubemap/nz.jpeg";
-import px from "./assets/cubemap/px.jpeg";
-import py from "./assets/cubemap/py.jpeg";
-import pz from "./assets/cubemap/pz.jpeg";
-import scratch from "./assets/textures/scratch.jpg";
+import * as OBJLoader from "./helpers/OBJLoader";
+import particleJpg from "./assets/textures/particle.jpg";
+import * as Stats from './helpers/stats';
 
 console.log("Needed so it works", OrbitControls);
+console.log("Needed so it works 2", OBJLoader);
+console.log("THREE", THREE);
+console.log("particleJpg", particleJpg);
+console.log("Stats", Stats);
 
 function init() {
   var scene = new THREE.Scene();
-
-  // initialize objects
-  var planeMaterial = getMaterial("basic", "rgb(255, 255, 255)");
-  var plane = getPlane(planeMaterial, 30, 60);
-  plane.name = 'plane-1';
-
-  // manipulate objects
-  plane.rotation.x = Math.PI / 2;
-  plane.rotation.z = Math.PI / 4;
-
-  // add objects to the scene
-  scene.add(plane);
+  const stats = new Stats();
+  console.log('stats', Stats);
+  
+  document.body.appendChild(stats.dom);
 
   // camera
   var camera = new THREE.PerspectiveCamera(
@@ -39,95 +25,58 @@ function init() {
     1, // near clipping plane
     1000 // far clipping plane
   );
-  camera.position.z = 20;
+  camera.position.z = 30;
   camera.position.x = 0;
-  camera.position.y = 5;
+  camera.position.y = 1;
   camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  var particleMat = new THREE.PointsMaterial({
+    color: "rgb(255, 255, 255)",
+    size: 0.25,
+    map: new THREE.TextureLoader().load(particleJpg),
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+
+  var particleGeo = new THREE.SphereGeometry(10, 64, 64);
+  particleGeo.vertices.forEach((vertex) => {
+	vertex.x += Math.random() - 0.5;
+	vertex.y += Math.random() - 0.5;
+	vertex.z += Math.random() - 0.5;
+  })
+
+  var particleSystem = new THREE.Points(particleGeo, particleMat);
+  particleSystem.name = "particleSystem";
+  scene.add(particleSystem);
 
   // renderer
   var renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
-  document.getElementById("webgl").appendChild(renderer.domElement);
+  renderer.setClearColor("rgb(20, 20, 20)");
 
   var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  update(renderer, scene, camera, controls);
+  document.getElementById("webgl").appendChild(renderer.domElement);
+
+  update(renderer, scene, camera, controls, stats);
 
   return scene;
 }
 
-function getPlane(material, size, segments) {
-  var geometry = new THREE.PlaneGeometry(size, size, segments, segments);
-
-  material.side = THREE.DoubleSide;
-
-  var obj = new THREE.Mesh(geometry, material);
-  obj.receiveShadow = true;
-  obj.castShadow = true;
-
-  return obj;
-}
-
-function getMaterial(type, color) {
-  var selectedMaterial;
-  var materialOptions = {
-    color: color === undefined ? "rgb(255, 255, 255)" : color,
-    wireframe: true,
-  };
-
-  switch (type) {
-    case "basic":
-      selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
-      break;
-    case "lambert":
-      selectedMaterial = new THREE.MeshLambertMaterial(materialOptions);
-      break;
-    case "phong":
-      selectedMaterial = new THREE.MeshPhongMaterial(materialOptions);
-      break;
-    case "standard":
-      selectedMaterial = new THREE.MeshStandardMaterial(materialOptions);
-      break;
-    default:
-      selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
-      break;
-  }
-
-  return selectedMaterial;
-}
-
-function update(renderer, scene, camera, controls) {
+function update(renderer, scene, camera, controls, stats) {
   controls.update();
+  stats.update();
   renderer.render(scene, camera);
 
-  var plane = scene.getObjectByName('plane-1');
-  plane.updateMatrixWorld();
-  
-	var planeGeo = plane.geometry;
+  const particleSystem = scene.getObjectByName("particleSystem");
+  particleSystem.rotation.y += 0.005;
 
-  console.log('planeGeo', planeGeo, planeGeo.attributes.position);
-  // console.log( plane.geometry.isBufferGeometry );
-  const position = planeGeo.attributes.position;
-
-  const vector = new THREE.Vector3();
-
-   for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-      vector.fromBufferAttribute( position, i );
-      vector.applyMatrix4( planeGeo.matrixWorld );
-      console.log(vector);
-   
-   }
-  
-
-	// planeGeo.attributes.position.array.forEach(function(vertex, index) {
-  //   console.log('vertex', vertex);
-  //   vertex.z = Math.random();
-  // });
+  particleSystem.geometry.verticesNeedUpdate = true;
 
   requestAnimationFrame(function () {
-    update(renderer, scene, camera, controls);
+    update(renderer, scene, camera, controls, stats);
   });
 }
 
